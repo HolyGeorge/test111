@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Итоги сессий ИННОПРОМ. Беларусь</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f7f7f7;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .page-header {
+    background: #fff;
+    padding: 48px 24px 40px;
+    text-align: center;
+    border-bottom: 1px solid #e8e8e8;
+  }
+  .page-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+    color: #1a1a1a;
+  }
+  .page-header .subtitle {
+    font-size: 14px;
+    color: #666;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .cards-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 24px 28px;
+    transition: box-shadow .2s, border-color .2s;
+    cursor: pointer;
+  }
+  .card:hover {
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    border-color: #d0d0d0;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    color: #1a1a1a;
+  }
+  .card-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0054a6;
+    margin-bottom: 12px;
+  }
+  .card-preview {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: #0054a6;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-link:hover { text-decoration: underline; color: #003d7a; }
+
+  #detail-view { display: none; }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #0054a6;
+    margin-bottom: 28px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+  }
+  .back-btn:hover { text-decoration: underline; color: #003d7a; }
+
+  .detail-hero {
+    width: 100%;
+    height: 280px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    background: #e8e8e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .detail-hero img { width: 100%; height: 100%; object-fit: cover; }
+  .detail-hero-placeholder { font-size: 48px; color: #bbb; }
+
+  .detail-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0054a6;
+    margin-bottom: 12px;
+  }
+  .detail-title {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 24px;
+    color: #1a1a1a;
+  }
+  .detail-content {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 32px;
+    font-size: 15px;
+    line-height: 1.75;
+    white-space: pre-wrap;
+    color: #333;
+  }
+  .detail-content .section-heading {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #0054a6;
+  }
+  .detail-content .section-heading:first-child { margin-top: 0; }
+  .detail-content .bullet-item {
+    padding: 6px 0 6px 18px;
+    position: relative;
+    color: #444;
+  }
+  .detail-content .bullet-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0054a6;
+  }
+  .detail-content .plain-text { color: #444; margin-bottom: 6px; }
+  .detail-content .speakers { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .detail-content .speaker-tag {
+    background: rgba(0,84,166,.1);
+    color: #0054a6;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 80px 20px;
+    color: #888;
+    font-size: 15px;
+  }
+  .loading .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e5e5;
+    border-top-color: #0054a6;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 600px) {
+    .page-header h1 { font-size: 24px; }
+    .detail-title { font-size: 20px; }
+    .detail-content { padding: 24px; }
+    .detail-hero { height: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Итоги сессий ИННОПРОМ. Беларусь</h1>
+  <p class="subtitle">Деловая программа — ключевые выводы</p>
+</div>
+
+<div class="container">
+  <div id="cards-view">
+    <div class="loading" id="loader">
+      <div class="spinner"></div>
+      Загрузка сессий...
+    </div>
+    <div class="cards-grid" id="cards-grid"></div>
+  </div>
+
+  <div id="detail-view">
+    <button class="back-btn" type="button" id="back-btn">← Назад к списку</button>
+    <div id="detail-hero-container"></div>
+    <span class="detail-date" id="detail-date"></span>
+    <h2 class="detail-title" id="detail-title"></h2>
+    <div class="detail-content" id="detail-content"></div>
+  </div>
+</div>
+
+<script>
+const AIRTABLE_TOKEN = 'patifK5MrTwayqjOD.ae57b8e77f4323222ed0023c4550bee4c9691a93ad4ac649af76f43fb10a4c97';
+const BASE_ID = 'appx8BTATPq5SLTLE';
+const TABLE_ID = 'tblrPgG9OArUNtnNt';
+let records = [];
+
+const DEMO_RECORDS = [{
+  id: 'demo1',
+  fields: {
+    'Название сессии': 'Комплексная цифровизация производства: эффективные экосистемы для ведущих отраслей',
+    'Дата': '2025-09-29',
+    'Пересказ': 'ИТОГИ СЕССИИ. Комплексная цифровизация производства.\n\nКЛЮЧЕВЫЕ ТЕЗИСЫ:\n• Трансмашхолдинг: 60 тыс. мест, 1С ERP\n• Атлант: 1С ERP 2, цепочка поставок\n• Ивацевичдрев: трудозатраты -20%\n• Борисовский завод Металлист: цикл +20%\n• Полипластик: 32 завода, 140 баз\n• Завод Роботов: производство роботов роботами\n• СТЕКЛОЛЮКС: партионный учёт, штрихкодирование\n\nВЫВОДЫ: прибыль +12%, простои -11%, брак -15%.\n\nСПИКЕРЫ: Алексей Нестеров (1С), Анатолий Ушаков (Трансмашхолдинг), Александр Стадольник (АТЛАНТ), Наталья Ильницкая (Ивацевичдрев), Дмитрий Сухина (Металлист), Наталья Ярец (СТЕКЛОЛЮКС), Владимир Муромцев (Полицифра), Андрей Гриценко (Завод Роботов), Владлен Шорин (РТ-Техприемка)'
+  }
+}];
+
+async function loadRecords() {
+  try {
+    const res = await fetch(
+      `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}?sort%5B0%5D%5Bfield%5D=%D0%94%D0%B0%D1%82%D0%B0&sort%5B0%5D%5Bdirection%5D=desc`,
+      { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } }
+    );
+    const data = await res.json();
+    records = (data.records && data.records.length) ? data.records : DEMO_RECORDS;
+    renderCards();
+  } catch (e) {
+    records = DEMO_RECORDS;
+    renderCards();
+  }
+}
+
+function getField(rec, name) { return rec.fields[name] || ''; }
+
+function formatDate(s) {
+  if (!s) return '';
+  const d = new Date(s + 'T00:00:00');
+  const m = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function getPhotoUrl(rec) {
+  const p = rec.fields['Фото'];
+  return (p && p.length) ? p[0].url : null;
+}
+
+function getPreviewText(t) {
+  if (!t) return '';
+  const c = t.replace(/КЛЮЧЕВЫЕ ТЕЗИСЫ:|ОСНОВНЫЕ ВЫВОДЫ:|ВЫВОДЫ|СПИКЕРЫ[:\s]*/gi, '').replace(/•/g, '').trim();
+  return c.substring(0, 140) + '...';
+}
+
+function renderCards() {
+  document.getElementById('loader').style.display = 'none';
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+  if (!records.length) {
+    grid.innerHTML = '<p style="color:#888;text-align:center;padding:40px">Сессии пока не добавлены</p>';
+    return;
+  }
+  records.forEach((rec, i) => {
+    const title = getField(rec, 'Название сессии') || getField(rec, 'Название');
+    const date = getField(rec, 'Дата');
+    const summary = getField(rec, 'Пересказ') || getField(rec, 'Итоги');
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.onclick = () => showDetail(i);
+    card.innerHTML = `
+      <div class="card-title">${title}</div>
+      <div class="card-date">${formatDate(date)}</div>
+      <div class="card-preview">${getPreviewText(summary)}</div>
+      <span class="card-link">Подробнее →</span>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function parseContent(text) {
+  if (!text) return '<p>Итоги пока не добавлены</p>';
+  const lines = text.split('\n');
+  let html = '', inSpeakers = false, speakerItems = [];
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].trim();
+    if (!t) { html += '<br>'; continue; }
+    const m = t.match(/^(КЛЮЧЕВЫЕ ТЕЗИСЫ|ОСНОВНЫЕ ВЫВОДЫ|ВЫВОДЫ|СПИКЕРЫ)\s*:?\s*(.*)/i);
+    if (m) {
+      if (inSpeakers && speakerItems.length)
+        html += '<div class="speakers">' + speakerItems.map(s => `<span class="speaker-tag">${s}</span>`).join('') + '</div>';
+      speakerItems = [];
+      inSpeakers = /СПИКЕРЫ/i.test(m[1]);
+      html += `<div class="section-heading">${m[1].replace(/:$/, '')}</div>`;
+      if (inSpeakers && m[2]) speakerItems = m[2].split(/\s*,\s*/).filter(Boolean);
+      continue;
+    }
+    if (inSpeakers) { speakerItems = speakerItems.concat(t.split(/\s*,\s*/).filter(Boolean)); continue; }
+    if (/^[•\-]\s*/.test(t)) html += `<div class="bullet-item">${t.replace(/^[•\-]\s*/, '')}</div>`;
+    else html += `<div class="plain-text">${t}</div>`;
+  }
+  if (inSpeakers && speakerItems.length)
+    html += '<div class="speakers">' + speakerItems.map(s => `<span class="speaker-tag">${s}</span>`).join('') + '</div>';
+  return html;
+}
+
+function showDetail(idx) {
+  const rec = records[idx];
+  const title = getField(rec, 'Название сессии') || getField(rec, 'Название');
+  const date = getField(rec, 'Дата');
+  const summary = getField(rec, 'Пересказ') || getField(rec, 'Итоги');
+  const photo = getPhotoUrl(rec);
+  document.getElementById('detail-hero-container').innerHTML = photo
+    ? `<div class="detail-hero"><img src="${photo}" alt=""></div>`
+    : `<div class="detail-hero"><span class="detail-hero-placeholder">⚙</span></div>`;
+  document.getElementById('detail-date').textContent = formatDate(date);
+  document.getElementById('detail-title').textContent = title;
+  document.getElementById('detail-content').innerHTML = parseContent(summary);
+  document.getElementById('cards-view').style.display = 'none';
+  document.getElementById('detail-view').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function showCards() {
+  document.getElementById('detail-view').style.display = 'none';
+  document.getElementById('cards-view').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('back-btn').onclick = showCards;
+loadRecords();
+</script>
+</body>
+</html>
