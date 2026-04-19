@@ -52,7 +52,7 @@
   .card-date {
     font-size: 14px;
     font-weight: 600;
-    color: #4495D1;
+    color: #1FA345;
     margin-bottom: 12px;
   }
   .card-preview {
@@ -68,7 +68,7 @@
   .card-link {
     font-size: 14px;
     font-weight: 600;
-    color: #4495D1;
+    color: #1FA345;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -84,7 +84,7 @@
     gap: 8px;
     font-size: 14px;
     font-weight: 600;
-    color: #4495D1;
+    color: #1FA345;
     margin-bottom: 28px;
     cursor: pointer;
     border: none;
@@ -103,7 +103,7 @@
   .detail-date {
     font-size: 14px;
     font-weight: 600;
-    color: #4495D1;
+    color: #1FA345;
     margin-bottom: 24px;
     display: block;
   }
@@ -124,7 +124,7 @@
     margin-top: 24px;
     margin-bottom: 10px;
     padding-bottom: 8px;
-    border-bottom: 2px solid #4495D1;
+    border-bottom: 2px solid #1FA345;
   }
   .detail-content .section-heading:first-child { margin-top: 0; }
   .detail-content .bullet-item {
@@ -140,7 +140,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #4495D1;
+    background: #1FA345;
   }
   .detail-content .plain-text { color: #444; margin-bottom: 6px; }
   .detail-content .paragraph-gap { height: 1.2em; margin: 0; }
@@ -154,7 +154,7 @@
     content: '•';
     position: absolute;
     left: 0;
-    color: #4495D1;
+    color: #1FA345;
     font-weight: 700;
   }
   .detail-content .speaker-moderator {
@@ -179,7 +179,7 @@
     width: 32px;
     height: 32px;
     border: 3px solid #e5e5e5;
-    border-top-color: #4495D1;
+    border-top-color: #1FA345;
     border-radius: 50%;
     animation: spin .7s linear infinite;
     margin: 0 auto 16px;
@@ -227,17 +227,35 @@ const DEMO_RECORDS = [{
 }];
 
 async function loadRecords() {
+  let loaded = false;
+  const fallback = setTimeout(() => {
+    if (loaded) return;
+    loaded = true;
+    console.warn('[Airtable] Fallback timeout — using demo data');
+    records = DEMO_RECORDS;
+    renderCards();
+  }, 5000);
   try {
+    const controller = new AbortController();
+    const abortTimer = setTimeout(() => controller.abort(), 4500);
     const res = await fetch(
       `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`,
-      { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } }
+      { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }, signal: controller.signal }
     );
+    clearTimeout(abortTimer);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
+    if (loaded) return;
+    loaded = true;
+    clearTimeout(fallback);
     records = (data.records || []).filter(r => r.fields && Object.keys(r.fields).length > 0);
     if (!records.length) records = DEMO_RECORDS;
-    if (records[0]) console.log('[Airtable] Field names:', Object.keys(records[0].fields));
     renderCards();
   } catch (e) {
+    if (loaded) return;
+    loaded = true;
+    clearTimeout(fallback);
+    console.warn('[Airtable] Load failed:', e.message || e);
     records = DEMO_RECORDS;
     renderCards();
   }
