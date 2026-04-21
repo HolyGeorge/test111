@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Итоги сессий ИННОПРОМ. Беларусь</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #ffffff;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  .cards-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 30px;
+    padding: 24px 28px;
+    transition: box-shadow .2s, border-color .2s;
+    cursor: pointer;
+  }
+  .card:hover {
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    border-color: #d0d0d0;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+  }
+  .card-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1FA345;
+    margin-bottom: 12px;
+  }
+  .card-preview {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card-link {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1FA345;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-link:hover { text-decoration: underline; color: #ed0f73; }
+
+  #detail-view { display: none; }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1FA345;
+    margin-bottom: 28px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+  }
+  .back-btn:hover { text-decoration: underline; color: #ed0f73; }
+
+  .detail-title {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+  }
+  .detail-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1FA345;
+    margin-bottom: 24px;
+    display: block;
+  }
+  .detail-content {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 32px;
+    font-size: 15px;
+    line-height: 1.75;
+    white-space: pre-wrap;
+    color: #333;
+  }
+  .detail-content .section-heading {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #1FA345;
+  }
+  .detail-content .section-heading:first-child { margin-top: 0; }
+  .detail-content .section-heading.section-heading--stream {
+    margin-bottom: 2px;
+    padding-bottom: 4px;
+  }
+  .detail-content .bullet-item {
+    padding: 6px 0 6px 18px;
+    position: relative;
+    color: #444;
+  }
+  .detail-content .bullet-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #1FA345;
+  }
+  .detail-content .plain-text { color: #444; margin-bottom: 6px; }
+  .detail-content .paragraph-gap { height: 1.2em; margin: 0; }
+  .detail-content .speakers-section { margin-top: 24px; }
+  .detail-content .detail-video + .section-heading.speakers-section {
+    margin-top: 4px;
+  }
+  .detail-content .speaker-bullet {
+    padding: 6px 0 6px 18px;
+    position: relative;
+    color: #444;
+  }
+  .detail-content .speaker-bullet::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #1FA345;
+    font-weight: 700;
+  }
+  .detail-content .speaker-group-title {
+    margin-top: 14px;
+    margin-bottom: 4px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  .detail-content .speaker-group-title:first-of-type {
+    margin-top: 0;
+  }
+  .detail-content .speaker-moderator {
+    padding: 6px 0 6px 0 !important;
+    margin-top: 8px;
+    color: #444;
+    padding-left: 0 !important;
+    list-style: none !important;
+  }
+  .detail-content .speaker-moderator::before {
+    content: none !important;
+    display: none !important;
+  }
+  .detail-video {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  .detail-video-frame {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #f5f5f5;
+  }
+  .detail-video-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 80px 20px;
+    color: #888;
+    font-size: 15px;
+  }
+  .loading .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e5e5;
+    border-top-color: #1FA345;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 600px) {
+    .detail-title { font-size: 20px; }
+    .detail-content { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div id="cards-view">
+    <div class="loading" id="loader">
+      <div class="spinner"></div>
+      Загрузка сессий...
+    </div>
+    <div class="cards-grid" id="cards-grid"></div>
+  </div>
+
+  <div id="detail-view">
+    <button class="back-btn" type="button" id="back-btn">← Назад к списку</button>
+    <h2 class="detail-title" id="detail-title"></h2>
+    <span class="detail-date" id="detail-date"></span>
+    <div class="detail-content" id="detail-content"></div>
+  </div>
+</div>
+
+<script>
+const AIRTABLE_TOKEN = 'patxTdlXpPLsCUGdL.5fffeb42b0f85007dda2e9ab18ff0428e50307298355d3e99c5a776db52e13cd';
+const BASE_ID = 'appx8BTATPq5SLTLE';
+const TABLE_ID = 'tblrPgG9OArUNtnNt';
+/** ID вида (viw…), в котором вы расставили сессии в нужном порядке — API вернёт строки в том же порядке, что и в этой сетке. Скопируйте из URL Airtable при открытом нужном виде. */
+const AIRTABLE_VIEW_ID = 'viwlQSS7iWGzHif2R';
+const TEST_VIDEO_RECORD = {
+  id: 'local-test-rutube-card',
+  fields: {
+    'Название': 'Главная пленарная сессия "Технологические хабы - новый промышленный ландшафт Евразии"',
+    'Резюме сессии': 'Запись трансляции',
+    'Дата': '2026-04-20',
+    'Спикеры': `Приглашенные спикеры:
+Денис Мантуров - Первый заместитель Председателя Правительства Российской Федерации
+Жамшид Ходжаев - Заместитель Премьер-министра Республики Узбекистан
+Виктор Каранкевич - Заместитель Премьер-министра Республики Беларусь
+Ерсайын Нагаспаев - Министр промышленности и строительства Республики Казахстан
+Шерали Кабир - Министр промышленности и новых технологий Республики Таджикистан
+Гоар Барсегян - Член Коллегии (Министр) по промышленности и агропромышленному комплексу, Евразийская экономическая комиссия
+Александр Дрозденко - Губернатор Ленинградской области
+Шавкат Абдуразаков - Хоким Наманганской области
+
+Почетные гости:
+Лазиз Кудратов - Министр инвестиций, промышленности и торговли Республики Узбекистан
+Андрей Кузнецов - Министр промышленности Республики Беларусь
+Нуруддин Азизи - Министр промышленности и торговли Исламской Республики Афганистан
+Искендер Асылкулов - Заместитель Министра экономики и коммерции Кыргызской Республики
+Сезаи Учармак - Заместитель Министра торговли Турецкой Республики
+Байрамгулы Татов - Заместитель Министра промышленности и строительного производства Туркменистана
+
+Модератор: Антон Атрашкин - Программный директор, ИННОПРОМ. Центральная Азия`,
+    'Rutube URL': 'https://rutube.ru/video/a9c5df825e092104242165ed4f769331/'
+  }
+};
+let records = [];
+let loadFailed = false;
+
+function buildRecordsListUrl(offset) {
+  const params = new URLSearchParams();
+  if (AIRTABLE_VIEW_ID) params.set('view', AIRTABLE_VIEW_ID);
+  if (offset) params.set('offset', offset);
+  const qs = params.toString();
+  return `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}${qs ? '?' + qs : ''}`;
+}
+
+async function loadRecords() {
+  let loaded = false;
+  const fallback = setTimeout(() => {
+    if (loaded) return;
+    loaded = true;
+    console.warn('[Airtable] Fallback timeout');
+    loadFailed = false;
+    records = [TEST_VIDEO_RECORD];
+    renderCards();
+  }, 60000);
+  try {
+    const recordsAcc = [];
+    let offset = null;
+    let pages = 0;
+    do {
+      if (++pages > 40) throw new Error('Слишком много страниц Airtable');
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const abortTimer = controller ? setTimeout(() => controller.abort(), 25000) : null;
+      const fetchOptions = { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } };
+      if (controller) fetchOptions.signal = controller.signal;
+      const res = await fetch(buildRecordsListUrl(offset), fetchOptions);
+      if (abortTimer) clearTimeout(abortTimer);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      for (let i = 0; i < (data.records || []).length; i++) {
+        const r = data.records[i];
+        if (r && r.fields && Object.keys(r.fields).length > 0) recordsAcc.push(r);
+      }
+      offset = data.offset || null;
+    } while (offset);
+
+    if (loaded) return;
+    loaded = true;
+    clearTimeout(fallback);
+    loadFailed = false;
+    records = [TEST_VIDEO_RECORD, ...recordsAcc];
+    renderCards();
+  } catch (e) {
+    if (loaded) return;
+    loaded = true;
+    clearTimeout(fallback);
+    console.warn('[Airtable] Load failed:', e.message || e);
+    loadFailed = false;
+    records = [TEST_VIDEO_RECORD];
+    renderCards();
+  }
+}
+
+function getField(rec, name) { return rec.fields[name] || ''; }
+
+function getFieldAny(rec, ...names) {
+  for (const n of names) {
+    const v = rec.fields[n];
+    if (v !== undefined && v !== null && v !== '') return v;
+  }
+  return '';
+}
+
+function getDateField(rec) {
+  const known = getFieldAny(rec, 'Дата', 'Дата проведения', 'Дата сессии', 'Date', 'дата');
+  if (known) return known;
+  for (const [key, val] of Object.entries(rec.fields || {})) {
+    if (!val) continue;
+    const s = String(val).trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(s) || /^\d{2}\.\d{2}\.\d{4}/.test(s)) return s;
+  }
+  return '';
+}
+
+function formatDate(s) {
+  if (!s) return '';
+  let str = String(s).trim();
+  const dmY = str.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+  if (dmY) str = dmY[3] + '-' + dmY[2].padStart(2,'0') + '-' + dmY[1].padStart(2,'0');
+  const datePart = str.split('T')[0].split(' ')[0] || str;
+  const d = new Date(datePart);
+  const m = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function getRutubeEmbedUrl(value) {
+  if (!value) return '';
+  const raw = String(value).trim();
+  const match = raw.match(/rutube\.ru\/video\/([a-zA-Z0-9_-]+)/i) || raw.match(/^([a-zA-Z0-9_-]{20,})$/);
+  if (!match) return '';
+  return `https://rutube.ru/play/embed/${match[1]}`;
+}
+
+function getPreviewText(t) {
+  if (!t) return '';
+  const c = String(t).trim();
+  return c.length > 140 ? c.substring(0, 140) + '...' : c;
+}
+
+function getSpeakersList(speakersField, fromПересказ) {
+  const parseItems = (raw) => {
+    const byNewline = raw.split(/\n/).map(s => s.trim()).filter(Boolean);
+    if (byNewline.length > 1) return byNewline;
+    const bySemicolon = raw.split(/\s*;\s*/).map(s => s.trim()).filter(Boolean);
+    if (bySemicolon.length > 1) return bySemicolon;
+    const byComma = raw.split(/\s*,\s*/).map(s => s.trim()).filter(Boolean);
+    return byComma.length > 0 ? byComma : (raw ? [raw] : []);
+  };
+  let items = [];
+  if (speakersField) items = parseItems(String(speakersField).trim());
+  else if (fromПересказ) {
+    const m = fromПересказ.match(/СПИКЕРЫ[:\s]*([\s\S]*?)(?=\n\n|$)/i);
+    if (m) items = parseItems(m[1].replace(/\n/g, ' ').trim());
+  }
+  const entries = [];
+  const isMod = (str) => /^\s*(\u041C\u043E\u0434\u0435\u0440\u0430\u0442\u043E\u0440|Moderator)\s*[::\s]/i.test(String(str).replace(/^\s+/, ''));
+  const isGroupTitle = (str) => /:\s*$/.test(String(str).trim()) && !isMod(str);
+  for (const s of items) {
+    if (isGroupTitle(s)) entries.push({ type: 'group', text: s });
+    else if (isMod(s)) entries.push({ type: 'moderator', text: s.replace(/^(\u041C\u043E\u0434\u0435\u0440\u0430\u0442\u043E\u0440|Moderator)\s*:\s*/i, '$1 - ') });
+    else entries.push({ type: 'speaker', text: s });
+  }
+  return entries;
+}
+
+function renderCards() {
+  document.getElementById('loader').style.display = 'none';
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+  if (loadFailed) {
+    grid.innerHTML = '<p style="color:#888;text-align:center;padding:40px">Не удалось загрузить сессии. Обновите страницу позже.</p>';
+    return;
+  }
+  if (!records.length) {
+    grid.innerHTML = '<p style="color:#888;text-align:center;padding:40px">Сессии пока не добавлены</p>';
+    return;
+  }
+  records.forEach((rec, i) => {
+    const title = getFieldAny(rec, 'Название сессии', 'Название');
+    const summary = getFieldAny(rec, 'Резюме сессии', 'Пересказ', 'Итоги');
+    const date = getDateField(rec);
+    const dateText = date ? formatDate(date) : 'Дата не указана';
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.onclick = () => showDetail(i);
+    card.innerHTML = `
+      <div class="card-title">${title}</div>
+      <div class="card-date">${dateText}</div>
+      <div class="card-preview">${getPreviewText(summary)}</div>
+      <span class="card-link">Подробнее →</span>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function buildDetailContent(summary, speakers, speakersFromText, videoUrl) {
+  const embedUrl = getRutubeEmbedUrl(videoUrl);
+  const sectionTitle = embedUrl ? 'Запись трансляции' : 'Резюме сессии';
+  const headingClass = embedUrl ? 'section-heading section-heading--stream' : 'section-heading';
+  let html = `<div class="${headingClass}">${sectionTitle}</div>`;
+  let summaryText = (summary || '').replace(/\n\s*СПИКЕРЫ[:\s]*[\s\S]*/i, '').trim();
+  if (embedUrl && /^запись трансляции\.?$/i.test(summaryText)) summaryText = '';
+  if (summaryText) {
+    let paragraphs = String(summaryText).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    if (paragraphs.length === 1 && paragraphs[0].length > 350) {
+      const sentences = paragraphs[0].match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [paragraphs[0]];
+      const normalizedSentences = sentences.map(s => s.trim()).filter(Boolean);
+      if (normalizedSentences.length > 1) {
+        const chunks = [];
+        for (let i = 0; i < normalizedSentences.length; i += 3) chunks.push(normalizedSentences.slice(i, i + 3).join(' '));
+        paragraphs = chunks;
+      }
+    }
+    for (let i = 0; i < paragraphs.length; i++) {
+      if (i > 0) html += '<div class="paragraph-gap"></div>';
+      const lines = paragraphs[i].split('\n');
+      for (const line of lines) {
+        const t = line.trim();
+        if (!t) continue;
+        if (/^[•\-]\s*/.test(t)) html += `<div class="bullet-item">${t.replace(/^[•\-]\s*/, '')}</div>`;
+        else html += `<div class="plain-text">${t}</div>`;
+      }
+    }
+  } else if (!embedUrl) {
+    html += '<div class="plain-text">Резюме пока не добавлено</div>';
+  }
+  if (embedUrl) {
+    html += `
+      <div class="detail-video">
+        <div class="detail-video-frame">
+          <iframe
+            src="${embedUrl}"
+            title="Видео сессии Rutube"
+            allow="clipboard-write; autoplay; encrypted-media; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    `;
+  }
+  const speakerEntries = getSpeakersList(speakers, speakersFromText);
+  if (speakerEntries.length) {
+    html += '<div class="section-heading speakers-section">Спикеры</div>';
+    html += speakerEntries.map((entry) => {
+      if (entry.type === 'group') return `<div class="speaker-group-title">${entry.text}</div>`;
+      if (entry.type === 'moderator') return `<div class="speaker-moderator" style="padding-left:0!important">${entry.text}</div>`;
+      return `<div class="speaker-bullet">${entry.text}</div>`;
+    }).join('');
+  }
+  return html;
+}
+
+function showDetail(idx) {
+  const rec = records[idx];
+  const title = getFieldAny(rec, 'Название сессии', 'Название');
+  const summary = getFieldAny(rec, 'Резюме сессии', 'Пересказ', 'Итоги');
+  const speakers = getFieldAny(rec, 'Спикеры', 'Спикер');
+  const videoUrl = getFieldAny(rec, 'Rutube URL', 'Rutube', 'Видео', 'Ссылка на видео');
+  const date = getDateField(rec);
+  document.getElementById('detail-title').textContent = title;
+  const dateEl = document.getElementById('detail-date');
+  if (date) {
+    dateEl.textContent = formatDate(date);
+    dateEl.style.display = 'block';
+  } else {
+    dateEl.style.display = 'none';
+  }
+  document.getElementById('detail-content').innerHTML = buildDetailContent(summary, speakers, summary, videoUrl);
+  document.getElementById('cards-view').style.display = 'none';
+  document.getElementById('detail-view').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function showCards() {
+  document.getElementById('detail-view').style.display = 'none';
+  document.getElementById('cards-view').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('back-btn').onclick = showCards;
+loadRecords();
+</script>
+</body>
+</html>
